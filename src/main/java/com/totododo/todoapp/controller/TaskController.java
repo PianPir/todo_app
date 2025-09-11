@@ -29,10 +29,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task, BindingResult result){
-        if(result.hasErrors()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.getAllErrors().get(0).getDefaultMessage());
-        }
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task){
 
         if(task.getCategory()!=null && task.getCategory().getId()!=null){
             Category category = categoryRepository.findById(task.getCategory().getId())
@@ -46,11 +43,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task taskDetails, BindingResult result){
-        if(result.hasErrors()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.getAllErrors().get(0).getDefaultMessage());
-        }
-
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task taskDetails){
 
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
 
