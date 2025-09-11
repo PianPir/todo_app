@@ -4,24 +4,24 @@ import com.totododo.todoapp.model.Category;
 import com.totododo.todoapp.repository.CategoryRepository;
 import com.totododo.todoapp.repository.TaskRepository;
 import com.totododo.todoapp.model.Task;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/tasks")
 @CrossOrigin(origins = "http://localhost:8080")
 public class TaskController {
-    @Autowired
-    private TaskRepository taskRepository;
 
-    @Autowired
-    private CategoryRepository  categoryRepository;
+    private final TaskRepository taskRepository;
+    private final CategoryRepository  categoryRepository;
 
     @GetMapping
     public List<Task> getAllTasks(){
@@ -29,7 +29,11 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task){
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task, BindingResult result){
+        if(result.hasErrors()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.getAllErrors().get(0).getDefaultMessage());
+        }
+
         if(task.getCategory()!=null && task.getCategory().getId()!=null){
             Category category = categoryRepository.findById(task.getCategory().getId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -42,13 +46,18 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task taskDetails){
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @Valid @RequestBody Task taskDetails, BindingResult result){
+        if(result.hasErrors()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, result.getAllErrors().get(0).getDefaultMessage());
+        }
+
+
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
 
         if(task.getCategory()!=null && task.getCategory().getId()!=null){
             Category category = categoryRepository.findById(task.getCategory().getId())
                     .orElseThrow(() -> new RuntimeException("Category not found"));
-            task.setCategory(taskDetails.getCategory());
+            task.setCategory(category);
         }
 
         task.setTitle(taskDetails.getTitle());

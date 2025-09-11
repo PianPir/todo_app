@@ -3,7 +3,7 @@ package com.totododo.todoapp.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "tasks")
@@ -14,6 +14,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
     @Column(nullable = false)
     private String title;
 
