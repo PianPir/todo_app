@@ -1,8 +1,13 @@
 package com.totododo.todoapp.repository;
 
 import com.totododo.todoapp.model.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends CrudRepository<User, Long> {
-    User findByUsername(String username);
+import java.util.Optional;
+
+
+@Repository
+public interface UserRepository extends JpaRepository<User,Long> {
+    Optional<User> findByUsername(String username);
 }
